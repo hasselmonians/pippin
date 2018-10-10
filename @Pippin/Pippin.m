@@ -18,28 +18,29 @@ classdef Pippin < handle
             ts = CMBHOME.Utils.ContinuizeEpochs(root.ts);
             spk = CMBHOME.Utils.ContinuizeEpochs(root.cel_ts);
             [self.SpikeTrain, ~] = histc(spk,ts);
+            %self.SpikeTrain(self.SpikeTrain>1) = 1;
             
-            self.predictors(1).name = 'constant';
-            self.predictors(1).data = ones(size(self.SpikeTrain));
+            %self.predictors(1).name = 'constant';
+            %self.predictors(1).data = ones(size(self.SpikeTrain));
+            self.predictors = [];
             
             self.models = [];
+            self.Constant;
         end
         
         function self = addPredictor(self, mode, dat)
-            switch lower(mode)
-                case 'custom'
-                    keyboard
-                otherwise
-                    %try
-                        self.(mode);
-                    %catch
-                    %    warning('Unknown predictory type. End');
-                    %end
+            if exist('dat','var')
+                self.Other(mode, dat);
+            else
+                self.(mode);
             end
                     
         end
         
     end
+    
+    
+    %% Begin List 
     
 end
 
