@@ -8,7 +8,7 @@ function Spectral(self, order, nFilts, stds)
         self.predictors(end+1).name = 'Spectral';
         
         %%
-        keyboard; %note: There's an issue in creating xHist right now. 
+        %keyboard; %note: There's an issue in creating xHist right now. 
         if ~exist('order','var')
             order = 100;
         end
@@ -35,20 +35,21 @@ function Spectral(self, order, nFilts, stds)
         xHist = [];
         train = self.SpikeTrain;
         for i = 1:order
-           x = train(i:end);
+           x = train(i+1:end);
            pd = zeros(i,1);
-           xHist = [xHist [pd;x]]; 
+           xHist = [xHist [x;pd]]; 
         end
+        
         %}
         %%
         %sps = self.SpikeTrain;
         %Xsp = hankel(sps(1:end-order+1), sps(end-order+1:end));
         %Xsp = [Xsp; zeros(size(sps,1)-size(Xsp,1),size(Xsp,2))];
         
-        pred = xHist*kernel;
-        self.predictors(end).data = pred(1:end-1,:);
+        pred = xHist*kernel';
+        self.predictors(end).data = pred;
         self.predictors(end).info.order = order;
-        self.predictors(end).info.kernel = kernel;
+        self.predictors(end).info.kernel = kernel';
     else
         warning('Is already a field, not appending');
     end

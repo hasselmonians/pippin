@@ -23,8 +23,9 @@ function [d] = genTrain(self, modelNum, ifAll, N)
     
     pred = arrayfun(@(x) x.data, self.predictors,'UniformOutput',0);
     pred = cell2mat(pred);
-    pred = pred(:,inds==1);
-    beta = self.fullModel.beta(inds==1);    
+    %pred = pred(:,inds==1);
+    %beta = self.fullModel.beta(inds==1);    
+    beta = self.fullModel.beta;
     
     d = self.data;
     d.b_lfp = [];

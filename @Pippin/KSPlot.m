@@ -1,7 +1,10 @@
-function KSPlot(self, modelNum)        
+function [mCDF, eCDF] = KSPlot(self, modelNum)        
         
         spkIndex = find(self.SpikeTrain);
-        
+        if ~exist('modelNum','var')
+            modelNum=0;
+        end
+    
         if modelNum == 0 
             lambda = self.fullModel.lambda;
         else
@@ -25,5 +28,9 @@ function KSPlot(self, modelNum)
         plot([0 1], [0 1]+1.36/sqrt(N),'k')
         plot([0 1], [0 1]-1.36/sqrt(N),'k');
         xlabel('Model CDF'); ylabel('Empirical CDF');
+        xlim([0 1])
+        ylim([0 1])
+        axis square
+        
 
 end
