@@ -8,43 +8,31 @@ root = root.AlignSpike2Session;
 root.cel = [1 1];
 
 
-model = Pippin(root);
-model.Other('place1', [root.x]);
-model.Other('place2', [root.x.^2]);
+model = Pippin.Model(root);
 dir = [0;diff(X)>0];
-model.Other('dir', [dir]);
-model.genModels;
-model.fullModel.beta
-
-%% 
-row=64;
-load(SL(row).name);
-root.cel = SL(row).cel;
-EgoCentricRateMap_dev(root, 'boundaryMode',QP)
-
-%%
-
-row=1;load(SL(row).fname); 
-root = Resample(root,100);
-root = root.FixTime;
-root.cel = SL(row).cel;
-root.b_x = root.b_x - min(root.b_x); 
-root.b_y = root.b_y - min(root.b_y);
-
-model = Pippin(root);
-%
-model.Place;
-model.HeadDirection;
-model.AngularAcceleration;
-model.Other('time', [root.b_ts root.b_ts.^2]);
-model.Other('random', rand(size(root.b_ts)));
+Pippin.Predictors.Other(model, 'dir', [dir]);
+Pippin.Predictors.Spectral(model, 100,10);
+Pippin.Predictors.Other(model, 'time', [root.ts root.ts.^2]);
+Pippin.Predictors.Other(model, 'place', [root.x root.x.^2]);
 
 model.genModels;
-
 model.Summary
 
-for pred = 2:6
-    rp{pred} = model.Shuffle(pred, 100);
+figure; model.KSPlot;
+%% 
+load SL_Base.mat
+
+for i = 1:length(SL)
+    if isempty(SL(i).summary)
+        clc;
+        i
+        r = load(SL(i).name);
+        root = r.root; QP = r.QP;
+        root.cel = SL(i).cel;
+        SL(i).summary = EgoCentricRateMap_dev(root, 'boundaryMode', QP);
+        close all;
+    end
 end
+
 
 %% Ch-10 figuring out

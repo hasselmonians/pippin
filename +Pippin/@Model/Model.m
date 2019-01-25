@@ -1,6 +1,7 @@
-classdef Pippin < handle
-    %PIPPIN Summary of this class goes here
-    %   Detailed explanation goes here
+classdef Model < handle
+    % Point process neuron (Pippin) class.
+    %   Holds data required for leave-one-out approach to GLM decoding of
+    %   functional neuron types.
     
     properties
         predictors
@@ -11,21 +12,18 @@ classdef Pippin < handle
     end
     
     methods
-        function self = Pippin(root)
+        function self = Model(root)
             import Pippin.*
             self.data = root;
             
             ts = CMBHOME.Utils.ContinuizeEpochs(root.ts);
             spk = CMBHOME.Utils.ContinuizeEpochs(root.cel_ts);
             [self.SpikeTrain, ~] = histc(spk,ts);
-            %self.SpikeTrain(self.SpikeTrain>1) = 1;
-            
-            %self.predictors(1).name = 'constant';
-            %self.predictors(1).data = ones(size(self.SpikeTrain));
+
             self.predictors = [];
             
             self.models = [];
-            self.Constant;
+            Pippin.Predictors.Constant(self);
         end
         
         function self = addPredictor(self, mode, dat)
@@ -38,9 +36,6 @@ classdef Pippin < handle
         end
         
     end
-    
-    
-    %% Begin List 
-    
+        
 end
 

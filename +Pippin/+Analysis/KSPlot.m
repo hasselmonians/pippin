@@ -20,7 +20,7 @@ function [mCDF, eCDF] = KSPlot(self, modelNum)
         end
         
         % ploting
-        figure
+        
         [eCDF, zvals] = ecdf(Z);
         mCDF = 1-exp(-zvals);
         plot(mCDF, eCDF);

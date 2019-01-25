@@ -43,20 +43,24 @@ function [d] = genTrain(self, modelNum, ifAll, N)
             spikeTrain = poissrnd(lambda);
         else
             spikeTrain = self.SpikeTrain;
-            %ones(length(self.fullModel.lambda),1);
             beta = self.fullModel.beta;
             histInd = find((arrayfun(@(x) strcmp(x.name, 'Spectral'), self.predictors)));
             
-            %% ghgh
-            
-            % IMPORTANT: When this changes, it also needs to change in
-            % Spectral. 
-            % TODO: Seperate and integrate so they work together.
-            
             %% 
-            order = self.predictors(end).info.order;
-            kernel = self.predictors(end).info.kernel;
+            order = self.predictors(histInd).info.order;
+            kernel = self.predictors(histInd).info.kernel;
+            coeffs = self.fullModel.beta;
+            coeffs = coeffs((size(beta,1) - size(kernel,2))+1:size(beta,1));
+            ac = kernel*coeffs;
             
+            %%
+            for i = (order+1):size(self.predictors(1).data,1)
+               %%
+               st = spikeTrain(i-order+1:i);
+               keyboard %ugh
+            end
+            
+            %%
             tic;
             for i = (order+1):length(self.fullModel.lambda)
                 st = spikeTrain(i-order:i);
@@ -69,7 +73,7 @@ function [d] = genTrain(self, modelNum, ifAll, N)
                 end
                 st = xHist*kernel;
                 st = st(end,:);
-                pred(i,:) = [pred(i,1:size(pred,2)-10) st];
+                pred(i,:) = [pred(i,1:size(pred,2)-20) st];
                 lambda(i) = glmval(beta, pred(i,:),'log','Constant','off');
                 spikeTrain(i) = poissrnd(lambda(i));
                 dt = toc;

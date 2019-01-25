@@ -8,7 +8,6 @@ function Spectral(self, order, nFilts, stds)
         self.predictors(end+1).name = 'Spectral';
         
         %%
-        %keyboard; %note: There's an issue in creating xHist right now. 
         if ~exist('order','var')
             order = 100;
         end
