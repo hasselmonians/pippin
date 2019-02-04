@@ -1,4 +1,4 @@
-function AngularAcceleration(self)
+function self = AngularAcceleration(self)
 
 if ~any(strcmp('AngularAcceleration', arrayfun(@(x) x.name, self.predictors,'UniformOutput',0)))
 

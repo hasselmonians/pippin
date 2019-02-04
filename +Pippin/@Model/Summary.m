@@ -3,7 +3,9 @@
 %
 
 function T = Summary(self)
-
+    if isempty(self.models)
+        self.genModels;
+    end
     predictors = arrayfun(@(x) x.name, self.predictors,'UniformOutput',0);
     p = arrayfun(@(x) x.p, self.models);
     beta = self.fullModel.beta;

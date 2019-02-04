@@ -1,4 +1,4 @@
-function Place(self)
+function self = Place(self)
 
 if ~any(strcmp('Place', arrayfun(@(x) x.name, self.predictors,'UniformOutput',0)))
     self.predictors(end+1).name = 'Place';

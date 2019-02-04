@@ -1,4 +1,4 @@
-function genModels(self)
+function self = genModels(self)
     self.models = [];
     
     for i = 1:length(self.predictors)

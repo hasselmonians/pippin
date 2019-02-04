@@ -28,8 +28,11 @@ function [d] = genTrain(self, modelNum, ifAll, N)
     beta = self.fullModel.beta;
     
     d = self.data;
+    d.active_lfp = [];
+    d.path_lfp = [];
     d.b_lfp = [];
     d.spike = [];
+    
     
     for trainNum = 1:N % Generate MANY trains under the null, and fit with full and reduced model
         

@@ -1,4 +1,4 @@
-function SpikeHistory(self, order)
+function self = SpikeHistory(self, order)
 
     if ~any(strcmp('SpikeHistory', arrayfun(@(x) x.name, self.predictors, 'UniformOutput',0)))
         self.predictors(end+1).name = 'SpikeHistory';

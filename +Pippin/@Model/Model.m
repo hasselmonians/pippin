@@ -1,4 +1,4 @@
-classdef Model < handle
+classdef Model
     % Point process neuron (Pippin) class.
     %   Holds data required for leave-one-out approach to GLM decoding of
     %   functional neuron types.
@@ -23,7 +23,7 @@ classdef Model < handle
             self.predictors = [];
             
             self.models = [];
-            Pippin.Predictors.Constant(self);
+            self = Pippin.Predictors.Constant(self);
         end
         
         function self = addPredictor(self, mode, dat)

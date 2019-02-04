@@ -1,4 +1,4 @@
-function HeadDirection(self)
+function self = HeadDirection(self)
 
 if ~any(strcmp('HeadDirection', arrayfun(@(x) x.name, self.predictors,'UniformOutput',0)))
     self.predictors(end+1).name = 'HeadDirection';

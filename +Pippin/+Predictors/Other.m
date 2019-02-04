@@ -1,4 +1,4 @@
-function Other(self, predName, pred)
+function self = Other(self, predName, pred)
 
 if ~any(strcmp(predName, arrayfun(@(x) x.name, self.predictors,'UniformOutput',0)))
     self.predictors(end+1).name = predName;

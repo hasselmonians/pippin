@@ -23,5 +23,6 @@ for delta = steps
     [~, devA(end+1), ~] = glmfit(predShift, self.SpikeTrain, 'poisson','Constant','On');
 end
 
+plot(steps, devA)
 
 end

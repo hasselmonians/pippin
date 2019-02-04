@@ -1,4 +1,4 @@
-function Acceleration(self)
+function self = Acceleration(self)
 
 if ~any(strcmp('Acceleration', arrayfun(@(x) x.name, self.predictors,'UniformOutput',0)))
     self.predictors(end+1).name = 'Acceleration';

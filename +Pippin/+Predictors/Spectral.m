@@ -1,4 +1,4 @@
-function Spectral(self, order, nFilts, stds)
+function self = Spectral(self, order, nFilts, stds)
     % order = how far back (frames) that spiking can affect current \lambda
     % nFilts = how many banks to create. Banks are linearly space up to
     % nFilts

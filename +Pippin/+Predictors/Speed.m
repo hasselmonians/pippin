@@ -1,4 +1,4 @@
-function Speed(self)
+function self = Speed(self)
 
 if ~any(strcmp('Speed', arrayfun(@(x) x.name, self.predictors,'UniformOutput',0)))
     self.predictors(end+1).name = 'Speed';
