@@ -1,14 +1,14 @@
-function self = ISI(self)
+function self = XCorr(self, name, train)
     
     % Fits interspike intervals, based on raised cosine basis functions
     % See Pillow et al 2008 (Nature)    
     
     %%
-     if any(strcmp('ISI', arrayfun(@(x) x.name, self.predictors, 'UniformOutput',0)))
+     if any(strcmp(name, arrayfun(@(x) x.name, self.predictors, 'UniformOutput',0)))
          warning('already a predictor, not appending');
          return
      else
-        self.predictors(end+1).name = 'ISI';
+        self.predictors(end+1).name = name;
      end
     
     %%
@@ -21,7 +21,7 @@ function self = ISI(self)
     
     %%
     xHist = [];
-    train = self.SpikeTrain;
+    %train = self.SpikeTrain;
     for i = 1:order
        x = train(i+1:end);
        pd = zeros(i,1);

@@ -5,12 +5,13 @@ if ~any(strcmp('HeadDirection', arrayfun(@(x) x.name, self.predictors,'UniformOu
 
     h = CMBHOME.Utils.ContinuizeEpochs(self.data.headdir);
 
-    if max(h) > 5
+    if max(h) > 2*pi
        h = deg2rad(h);
        h = wrapToPi(h);
     end
     
     self.predictors(end).data = [h h.^2];
+    %self.predictors(end).data = [sin(h), cos(h)];
 else
     warning('Is already a field, not appending')
 end

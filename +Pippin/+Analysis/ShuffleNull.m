@@ -8,8 +8,10 @@ function ShuffleNull(model, N)
 
     spkOrig = model.SpikeTrain;
     dd = NaN(N, length(model.predictors));
-    betas = NaN(N, length(model.predictors));
-    
+    betas = NaN(N, sum(arrayfun(@(x) size(x.data,2), model.predictors)));
+    ddc = NaN(N, length(model.predictors));
+
+    %% for shuffling the spike train
     for n = 1:N
         disp(n)
         spk = zeros(length(spkOrig),1);
@@ -22,18 +24,32 @@ function ShuffleNull(model, N)
         s = model_.Summary;
         dd(n,:) = s.DevReduced;
         betas(n,:) = model_.fullModel.beta;
+        ddc(n,:) = arrayfun(@(x) x.cc.devCc, model.models);
     end
 
+
+    
     %%
     sTrue = model.Summary;
     sTrue = sTrue.DevReduced;
 
     for i = 1:length(sTrue)
-        iff(i) = sTrue(i) > prctile(dd(:,i), 95);
+        lb(i) = sTrue(i) < prctile(dd(:,i), .15);
+        ub(i) = sTrue(i) > prctile(dd(:,i), 99.85);
+        mn(i) = sTrue(i) > nanmean(dd(:,i));
     end
-    
+    iff = lb | ub;
     iff
     
+    %%
+    for i = 1:6
+        subplot(3,2,i)
+        hist(dd(:,i))
+        title(s.Var(i))
+        vline(sTrue(i))
+    end
+    
+    keyboard
 
 end
 

@@ -36,7 +36,7 @@ function [d] = genTrain(self, modelNum, ifAll, N)
     
     for trainNum = 1:N % Generate MANY trains under the null, and fit with full and reduced model
         
-        if ~any(arrayfun(@(x) strcmp(x.name, 'Spectral'), self.predictors))     
+        if ~any(arrayfun(@(x) strcmp(x.name, 'FixThis'), self.predictors))     
             % Generate with reduced model
             if modelNum > 0
                 lambda = glmval(beta,pred,'log','Constant','0ff');
@@ -45,9 +45,10 @@ function [d] = genTrain(self, modelNum, ifAll, N)
             end
             spikeTrain = poissrnd(lambda);
         else
+            keyboard
             spikeTrain = self.SpikeTrain;
             beta = self.fullModel.beta;
-            histInd = find((arrayfun(@(x) strcmp(x.name, 'Spectral'), self.predictors)));
+            histInd = find((arrayfun(@(x) strcmp(x.name, 'ISI'), self.predictors)));
             
             %% 
             order = self.predictors(histInd).info.order;
@@ -60,7 +61,7 @@ function [d] = genTrain(self, modelNum, ifAll, N)
             for i = (order+1):size(self.predictors(1).data,1)
                %%
                st = spikeTrain(i-order+1:i);
-               keyboard %ugh
+               %keyboard %ugh
             end
             
             %%
@@ -92,14 +93,7 @@ function [d] = genTrain(self, modelNum, ifAll, N)
         else
             d.spike(trainNum,1) = CMBHOME.Spike('ts',d.ts(spikeTrain>0),'vid_ts',d.b_ts);
         end
-        % fitting
-        %{
-        p = Pippin(d);
-        p.predictors = self.predictors;
-        p.genModels;
-        devC(i) = p.models(modelNum).dev;
-        devA(i) = p.fullModel.dev;
-        %}
+
     end    
     
 end

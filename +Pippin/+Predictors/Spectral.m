@@ -3,6 +3,7 @@ function self = Spectral(self, order, nFilts, stds)
     % nFilts = how many banks to create. Banks are linearly space up to
     % nFilts
 
+    % TODO: Delete this
 
     if ~any(strcmp('Spectral', arrayfun(@(x) x.name, self.predictors, 'UniformOutput',0)))
         self.predictors(end+1).name = 'Spectral';

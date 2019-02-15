@@ -1,12 +1,18 @@
-function [mCDF, eCDF] = KSPlot(self, modelNum)        
+function [mCDF, eCDF] = KSPlot(self, modelNum, CC)        
         
         spkIndex = find(self.SpikeTrain);
         if ~exist('modelNum','var')
             modelNum=0;
         end
+        
+        if ~exist('CC','var')
+            CC = 0;
+        end
     
         if modelNum == 0 
             lambda = self.fullModel.lambda;
+        elseif CC==1
+            lambda = self.models(modelNum).cc.lambda;
         else
             lambda = self.models(modelNum).lambda;
         end

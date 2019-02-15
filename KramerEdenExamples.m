@@ -79,17 +79,17 @@ root = CMBHOME.Session('b_x', rand(n,1),...
 root.cel = [1 1];
 
 model = Pippin.Model(root);
-Pippin.Predictors.Other(model, 'Imove', Imove);
-Pippin.Predictors.Other(model, 'dir', xdir);
-Pippin.Predictors.Spectral(model, 100, 20);
-model.genModels;
+model = Pippin.Predictors.Other(model, 'Imove', Imove);
+model = Pippin.Predictors.Other(model, 'dir', xdir);
+model = Pippin.Predictors.Spectral(model, 100, 20);
+model = model.genModels;
 model.Summary
 
 %% Chapter 11: Spike-Field Coherence
-clear
+%clear
 load ~/Downloads/Ch11-spikes-LFP-1.mat
 
-lfp = y(:);
+lfp = y'; lfp = lfp(:);
 t = (t(2)-t(1)) * (cumsum(ones(size(lfp)))-1);
 n = n(:);
 spkTs = t(find(n));
@@ -109,12 +109,11 @@ root.cel = [1 1];
 root.active_lfp = 1;
 
 model = Pippin.Model(root);
-
-Pippin.Predictors.PhaseLocking(model, [44 46])
-
-model.genModels
-
+model = Pippin.Predictors.PhaseLocking(model, [44 46]);
+model = model.genModels;
+model.Summary
 model.fullModel.beta
+
 
 %%
 Pippin.Analysis.ThinningFactor(model)
