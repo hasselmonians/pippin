@@ -27,7 +27,7 @@ function T = Summary(self)
     T.Var = predictors';
     T.DF = np';
     T.DevReduced = dd';
-    T.AIC = dAIC';
+    T.dAIC = dAIC';
     T.p = p';
     
     

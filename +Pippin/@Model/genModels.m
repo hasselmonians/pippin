@@ -1,4 +1,9 @@
 function self = genModels(self)
+
+    %TODO: Put a check in for this:
+    % arrayfun(@(x) sum(sum(isnan(x.data))), model.predictors)
+    % Model should NOT run if there are ANY NaN or inf -- don't even know
+    % how it affects glmfit
     self.models = [];
     
     for i = 1:length(self.predictors)
