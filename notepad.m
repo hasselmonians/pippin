@@ -1,16 +1,24 @@
-mat%%
+%%
 addpath ~/git/CMBHOME
 addpath pippin/
 import Pippin.*
 load ~/Downloads/BB05_041718_FE.mat
 
+
+root.b_x = root.b_x - min(root.b_x);
+root.b_y = root.b_y - min(root.b_y);
 root.cel = [8 2];
+[out, detailed]= EgoCentricRateMap_dev(root, 'degSamp', 10); close all
+%%
 model = Model(root);
 
 model = Predictors.HeadDirection(model);
 model = Predictors.Speed(model);
 model = Predictors.Place(model);
 model = Predictors.Random(model);
+model = Predictors.Acceleration(model);
+model = Predictors.ISI(model);
+model = Predictors.Other(model, 'EBC', [detailed.dis]);%, detailed.dis.^2]);
 
 model = model.genModels();
 
@@ -57,7 +65,9 @@ for i = 1:length(model.models)
             xx = size(meshgrid(x1,x2));
             imagesc(x1,x2,y); set(gca,'ydir','normal'); axis square
         case 'ISI'
-            1+1
+            basis = model.predictors(i).info.basis;
+            beta = model.models(i).cc.beta(2:end);
+            plot(basis*beta)
         case 'Random'
             x = prctile(model.predictors(i).data, [5 95]);
             x = x(:);
@@ -72,6 +82,17 @@ for i = 1:length(model.models)
             x = [x(:) x(:).^2];
             y = glmval(model.models(i).cc.beta, x, 'log');
             plot(x(:,1),exp(y))
+        case 'EBC'
+            x1 = 1:74; x1 = x1(:);
+            x2 = 1:74; x2 =x2.^2; x2 = x2(:);
+            for m = 1:length(x1)
+                for n = 1:length(x2)
+                    pred = [x1(m);x2(n)];
+                    y(m,n) = exp(glmval(model.models(i).cc.beta, pred, 'log'));
+                end
+            end
+            xx = size(meshgrid(x1,x2));
+            imagesc(x1,x2,y); set(gca,'ydir','normal'); axis square
         otherwise
            disp(['No plotter for pred ' nm])
     end
@@ -90,7 +111,7 @@ end
 
 
 %%
-
+%{
 dd = []; dt = {}; b=[]; bads = [];
 for i = 1:length(SL)
     try
@@ -242,4 +263,4 @@ for cel = 1:length(root.cells)
         rose2(wrapTo2Pi(root.cel_thetaphase{1}),17)
     end
 end
-
+%}

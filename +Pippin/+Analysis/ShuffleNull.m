@@ -1,4 +1,4 @@
-function ShuffleNull(model, N)
+function [iff, dd] = ShuffleNull(model, N)
 % Get the null distribution of a model for all parameters, under a shuffled
 % distribution. Warning, it's slowwwwww.
 
@@ -34,21 +34,22 @@ function ShuffleNull(model, N)
     sTrue = sTrue.DevReduced;
 
     for i = 1:length(sTrue)
-        lb(i) = sTrue(i) < prctile(dd(:,i), .15);
-        ub(i) = sTrue(i) > prctile(dd(:,i), 99.85);
+        lb(i) = sTrue(i) < prctile(dd(:,i), 2.5);
+        ub(i) = sTrue(i) > prctile(dd(:,i), 97.5);
         mn(i) = sTrue(i) > nanmean(dd(:,i));
     end
-    iff = lb | ub;
+    iff = ub;
     iff
     
     %%
-    for i = 1:6
-        subplot(3,2,i)
+    %{
+    for i = 1:length(model.predictors)
+        subplot(5,2,i)
         hist(dd(:,i))
         title(s.Var(i))
         vline(sTrue(i))
     end
-    
+    %}
     keyboard
 
 end
