@@ -50,7 +50,7 @@ function [iff, dd] = ShuffleNull(model, N)
         vline(sTrue(i))
     end
     %}
-    keyboard
+
 
 end
 
