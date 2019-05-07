@@ -3,7 +3,7 @@ function self = HeadDirection(self)
 if ~any(strcmp('HeadDirection', arrayfun(@(x) x.name, self.predictors,'UniformOutput',0)))
     self.predictors(end+1).name = 'HeadDirection';
 
-    h = CMBHOME.Utils.ContinuizeEpochs(self.data.headdir);
+    h = CMBHOME.Utils.nanInterp(CMBHOME.Utils.ContinuizeEpochs(self.data.headdir));
 
     if max(h) > 2*pi
        h = deg2rad(h);
