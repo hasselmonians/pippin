@@ -19,7 +19,7 @@ classdef Model
             ts = CMBHOME.Utils.ContinuizeEpochs(root.ts);
             spk = CMBHOME.Utils.ContinuizeEpochs(root.cel_ts);
             [self.SpikeTrain, ~] = histc(spk,ts);
-
+            self.SpikeTrain = self.SpikeTrain(:);
             self.predictors = [];
             
             self.models = [];
