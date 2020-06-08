@@ -9,10 +9,12 @@ classdef Model
         data
         SpikeTrain
         fullModel
+        bestModel
+        sigThresh
     end
     
     methods
-        function self = Model(root)
+        function self = Model(root, sigThresh)
             import Pippin.*
             self.data = root;
             
@@ -24,6 +26,12 @@ classdef Model
             
             self.models = [];
             self = Pippin.Predictors.Constant(self);
+            
+            if ~exist('sigThresh','var')
+                sigThresh = 0.01;
+            end
+            
+            self.sigThresh = sigThresh
         end
         
         function self = addPredictor(self, mode, dat)

@@ -82,17 +82,25 @@ function self = genModels(self)
         end
     end
     
-    %% create compact
-    %keyboard
-    %{
-    p = arrayfun(@(x) x.p, self.models) ;
-    drops = p>0.05;
-    drops(1) = 1;
+    %% create model using only the significant groups
+    T = self.Summary();
+    inds = T.p < self.sigThresh;
     
-    pred = arrayfun(@(x) x.data, self.predictors(~drops),'UniformOutput',0);
+    pred = arrayfun(@(x) x.data, self.predictors(inds),'UniformOutput',0);
     pred = cell2mat(pred);
-    mdl = fitglm(pred, self.SpikeTrain, 'Distribution','poisson');
-    %}
+    [betaA, devA, statsA] = glmfit(pred, self.SpikeTrain, 'poisson','Constant','0ff');
+    self.bestModel.beta = betaA;
+    self.bestModel.dev = devA;
+    self.bestModel.stats = statsA;
+    [lambdaA, upb, lowb] = glmval(self.bestModel.beta, pred, 'log',statsA,'Constant','0ff');
+    self.bestModel.lambda = lambdaA;
+    self.bestModel.lambda_l = lambdaA - lowb;
+    self.bestModel.lambda_u = lambdaA + upb;
+    
+    LL = nansum(log(poisspdf(self.SpikeTrain, lambdaA)));
+    self.bestModel.LogLikelihood = LL;
+    self.bestModel.AIC = -2*LL + 2*size(pred,2);
+        
 end
 
 
