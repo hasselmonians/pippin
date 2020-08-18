@@ -29,7 +29,7 @@ function T = Summary(self)
     T.DevReduced = dd';
     T.dAIC = dAIC';
     T.p = p';
-    
+    T.coefs = coeffs';
     
     
     

@@ -1,9 +1,5 @@
 function self = genModels(self)
 
-    %TODO: Put a check in for this:
-    % arrayfun(@(x) sum(sum(isnan(x.data))), model.predictors)
-    % Model should NOT run if there are ANY NaN or inf -- don't even know
-    % how it affects glmfit
     self.models = [];
     
     for i = 1:length(self.predictors)
@@ -12,6 +8,7 @@ function self = genModels(self)
 
     %% ModelA (full model)
     ma = cell2mat(dat);
+    
     [betaA, devA, statsA] = glmfit(ma, self.SpikeTrain, 'poisson','Constant','0ff');
     self.fullModel.beta = betaA;
     self.fullModel.dev = devA;
@@ -35,6 +32,7 @@ function self = genModels(self)
             inds(i) = [];
 
             mc = cell2mat(dat(inds));
+
             [betaC, devC, statsC] = glmfit(mc, self.SpikeTrain, 'poisson','Constant','Off');
             self.models(i).beta = betaC;
             self.models(i).dev = devC;

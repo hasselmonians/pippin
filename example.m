@@ -17,7 +17,7 @@ model = Pippin.Model(root);
 model = Pippin.Predictors.HeadDirection(model);
 model = Pippin.Predictors.Place(model);
 model = Pippin.Predictors.Speed(model);
-model = Pippin.Predictors.ISI(model);
+%model = Pippin.Predictors.ISI(model);
 
 %% Add custom predictors
 % You can also add a predictor manually. The only real limitation is that
@@ -49,3 +49,6 @@ pow = Pippin.Analysis.LambdaPower(model);
 
 disp(glmSummary)
 figure; plot(root.ts, cell2mat(pow'))
+
+%% Finally, create example spike trains from the fit model
+fake = model.genTrain(0);

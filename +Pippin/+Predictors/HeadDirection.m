@@ -10,8 +10,8 @@ if ~any(strcmp('HeadDirection', arrayfun(@(x) x.name, self.predictors,'UniformOu
        h = wrapToPi(h);
     end
     
-    self.predictors(end).data = [h h.^2];
-    %self.predictors(end).data = [sin(h), cos(h)];
+    %self.predictors(end).data = [h h.^2];
+    self.predictors(end).data = [sin(h), cos(h)];
 else
     warning('Is already a field, not appending')
 end

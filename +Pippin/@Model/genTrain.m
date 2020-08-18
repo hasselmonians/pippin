@@ -88,12 +88,13 @@ function [d] = genTrain(self, modelNum, ifAll, N)
                 end
             end       
         end
+        ts = CMBHOME.Utils.ContinuizeEpochs(d.ts);
         if isempty(d.spike)
-            d.spike = CMBHOME.Spike('ts',d.ts(spikeTrain>0),'vid_ts',d.b_ts);
+            d.spike = CMBHOME.Spike('ts',ts(spikeTrain>0),'vid_ts',d.b_ts);
         else
-            d.spike(trainNum,1) = CMBHOME.Spike('ts',d.ts(spikeTrain>0),'vid_ts',d.b_ts);
+            d.spike(trainNum,1) = CMBHOME.Spike('ts',ts(spikeTrain>0),'vid_ts',d.b_ts);
         end
 
     end    
-    
+    d = d.AlignSpike2Session;
 end
