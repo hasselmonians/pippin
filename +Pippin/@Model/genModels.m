@@ -83,6 +83,9 @@ function self = genModels(self)
     %% create model using only the significant groups
     T = self.Summary();
     inds = T.p < self.sigThresh;
+    if ~any(inds)  % If nothing is significant, at least test the FR
+        inds(1) = 1;
+    end
     
     pred = arrayfun(@(x) x.data, self.predictors(inds),'UniformOutput',0);
     pred = cell2mat(pred);

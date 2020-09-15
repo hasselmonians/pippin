@@ -14,7 +14,7 @@ function [iff, dd, AIC] = ShuffleNull(model, N)
     
     %% for shuffling the spike train
     for n = 1:N
-        disp(n)
+        %disp(n)
         spk = zeros(length(spkOrig),1);
         inds = randperm(length(spkOrig), sum(spkOrig));
         spk(inds) = 1;

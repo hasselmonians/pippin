@@ -16,7 +16,8 @@ function T = Summary(self)
     ind = 1;
     
     for i = 1:length(np)
-        coeffs{i} = exp(beta(ind:ind+np(i)-1));
+        %coeffs{i} = exp(beta(ind:ind+np(i)-1));
+        coeffs{i} = beta(ind:ind+np(i)-1);
         
         ind = ind+np(i);
         
