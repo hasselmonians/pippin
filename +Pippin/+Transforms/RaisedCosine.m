@@ -1,4 +1,4 @@
-function [ttgrid, Basis_orth, Basis, B_ctrs] = makeRaisedCosBasis(BasisPrs,zflag)
+function [ttgrid, Basis_orth, Basis, B_ctrs] = RaisedCosine(BasisPrs,zflag)
 % [ttgrid, Basis_orth, Basis, Bcenters] = makeRaisedCosBasis(BasisPrs,zflag)
 %
 % Make basis of raised cosines with logarithmically stretched time axis

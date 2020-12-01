@@ -1,106 +1,132 @@
-function [m1] = stepModel(self)
-
-    warning('off','stats:classreg:regr:LinearFormula:TermNotFound');
-    warning('off', 'stats:classreg:regr:LinearFormula:NoNewTerms');
-
-    %%
-    tbl = table();
-    predInd = [];
-    for i = 2:length(self.predictors)
-        for k = 1:size(self.predictors(i).data,2)
-            eval(['tbl.' self.predictors(i).name '_' num2str(k) '= self.predictors(i).data(:,k);'])
-            predInd = [predInd i-1];
-        end
+function [best] = stepModel(self, nFold)
+    
+    if ~exist('n','var')
+        nFold=2;
     end
+    
+    block = randi(nFold,length(self.SpikeTrain),1);
+    bads = sum(cell2mat(arrayfun(@(x) isnan(x.data), self.predictors, 'UniformOutput', false)),2)>0;
 
-    tbl.spike = self.SpikeTrain;
-
-    %%
-    m0 = fitglm(tbl, 'constant', 'Distribution', 'Poisson');
-    m1 = m0;
-    pAdd = 0.05;
-    pRemove = 0.10;
+    for i = 1:nFold
+        train{i} = find(block~=i & ~bads);
+        test{i} = find(block==i & ~bads);
+    end
+    
+    n = length(self.predictors)-1;
+    perm = dec2bin(0:(2^n)-1)-'0';
+    perm = [ones(size(perm,1),1) perm];
+    ST = self.SpikeTrain;
     
     %%
-    outerTrunk = 0;
-    while outerTrunk == 0
-        trunc=0; nAdd = 0;
-        while trunc == 0 
-            [m1, trunc] = larger(m1, predInd, pAdd);
-            nAdd = nAdd + 1;
-        end
+    for i = 1:size(perm,1)
+        for k = 1:nFold
+            % fit
+            preds = perm(i,:);
+            preds = cell2mat(arrayfun(@(x) x.data(train{k},:), self.predictors(find(preds)), 'UniformOutput',0));
+            [betaTrain, devTrain, statsTrain] = glmfit(preds, ST(train{k}), 'poisson','Constant','off');
+            llTrain = sum(log(poisspdf(ST(train{k}), glmval(betaTrain, preds, 'log','Constant','off'))));
 
-        trunc=0; nRem=0;
-        while trunc == 0
-            [m1, trunc] = smaller(m1, predInd, pRemove);
-            nRem = nRem + 1; 
+            % eval on test
+            preds = perm(i,:);
+            preds = cell2mat(arrayfun(@(x) x.data(test{k},:), self.predictors(find(preds)), 'UniformOutput',0));
+            llTest = sum(log(poisspdf(ST(test{k}), glmval(betaTrain, preds, 'log','Constant','off'))));
+
+            models(i).llTrain(k) = llTrain;
+            models(i).llTest(k) = llTest;
+            models(i).nParams = size(preds,2);
+            models(i).n = sum(perm(i,:));
+            models(i).betaTrain(k,:) = betaTrain;
+            models(i).params = perm(i,:);
+        end
+    end
+    models = models(:);
+    
+    %%
+    for i = 1:size(perm,1)
+        for k = 1:size(perm,1)
+            [p(i,k), T(i,k)] = LLRT(models(i), models(k));
+            if i==k
+                p(i,k) = NaN;
+            end
+        end
+    end
+    
+    %% 
+    bestModel = 1;
+    steps = 0;
+    change=1;
+    
+    while change
+        change=0; change_add=0; change_rem=0;
+        bmo = bestModel;
+        steps = steps+1;
+        
+        %% Adding
+        n = models(bestModel).n;
+        incr = arrayfun(@(x) x.n, models) == (n+1);
+        
+        clear nest
+        for k = 1:length(models)
+            nest(k) = all((models(k).params == models(bestModel).params) | models(bestModel).params==0);
         end
         
-        if nRem == 1
-            outerTrunk = 1;
+        test = find(nest' & incr);
+        p_ = p(bestModel, test);
+        ll = arrayfun(@(x) nanmean(x.llTest), models(test));
+        ll(p_>0.01) = -inf;
+        
+        if any(ll>nanmean(models(bmo).llTest))
+            [~,ind] = max(ll);
+            bestModel = test(ind);
+            change_add = ~(bestModel==bmo);
+            disp('add')
+        end
+        
+        %% Removing
+        n = models(bestModel).n;
+        incr = arrayfun(@(x) x.n, models) == (n-1);
+
+        clear nest p_
+        for k = 1:length(models)
+            nest(k) = all((models(k).params == models(bestModel).params) | models(k).params==0);
+        end
+
+        test = find(nest' & incr);
+        if ~isempty(test)
+            for k = 1:length(bestModel)
+                p_(k) = LLRT(models(test(k)), models(bestModel));
+            end
+
+            test = test(find(p_>0.01));
+            if ~isempty(test)
+                ll = arrayfun(@(x) nanmean(x.llTest), models(test));
+                ll(p_<0.01) = -inf;
+
+                [~,ind] = max(ll);
+                bestModel = test(ind);
+                change_rem = ~(bestModel==bmo);
+                disp('remove')
+            else
+               change_rem = 0; 
+            end
         else
-            outerTrunk = 0;
+            change_rem = 0;
         end
         
+        %% 
+        change = change_add || change_rem;
     end
     
-end
-
-function [m1, trunc] = larger(m0, predInd, pAdd)
-    for term = 1:max(predInd)
-        m = m0;
-        inds = find(predInd==term);
-        for subTerm = 1:sum(predInd==term)
-            v = zeros(1, length(predInd)+1);
-            v(inds(subTerm)) = 1;
-            m = m.addTerms(v);
-        end
-        newModel{term} = m;
-    end
-
-
-    [dDev, modelInd] = max(cellfun(@(x) m0.Deviance - x.Deviance, newModel));
-    p = gammainc(dDev/2,5/2,'upper');
-
-    if p < pAdd
-        disp('adding')
-        m1 = newModel{modelInd};
-        trunc=0;
-    else
-        m1 = m0; trunc=1;
-    end
-
-end
-
-
-function [m1, trunc] = smaller(m0, predInd, pRemove)
+best = models(bestModel);
   
-    for term = 1:max(predInd)
-        m = m0;
-        inds = find(predInd==term);
-        for subTerm = 1:sum(predInd==term)
-            v = zeros(1, length(predInd)+1);
-            v(inds(subTerm)) = 1;
-            m = m.removeTerms(v);
-        end
-        newModel{term} = m;
-    end
+end
 
-
-    [dDev] = (cellfun(@(x) x.Deviance - m0.Deviance, newModel));
-    dDev(dDev == 0) = inf;
-    
-    [dDev, modelInd] = min(dDev);
-    
-    p = gammainc(dDev/2,5/2,'upper');
-
-    if p > pRemove
-        disp('dropping')
-        m1 = newModel{modelInd};
-        trunc=0;
-    else
-        m1 = m0; trunc=1;
-    end
+function [p, T] = LLRT(model1, model2)
+    % model 1 = simple
+    % model 2 = complex
+    T= -2*nanmean(model1.llTest)+nanmean(2*model2.llTest);
+    p = 1-chi2cdf(T, model2.nParams - model1.nParams);
 
 end
+
 

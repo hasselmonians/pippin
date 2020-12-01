@@ -16,7 +16,7 @@ function self = ISI(self)
     Bprs.endpoints = [0, 0.5]; % location of 1st and last cosines
     Bprs.b = .01;  % nonlinear stretch factor (larger => more linear)
     Bprs.dt = 1/self.data.fs_video; % time bin size
-    [~, ~, basis, ~] = Pippin.Utils.makeRaisedCosBasis(Bprs); 
+    [~, ~, basis, ~] = Pippin.Transforms.RaisedCosine(Bprs); 
     order = size(basis,1);
     
     %%

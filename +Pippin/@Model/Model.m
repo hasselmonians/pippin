@@ -31,7 +31,7 @@ classdef Model
                 sigThresh = 0.01;
             end
             
-            self.sigThresh = sigThresh
+            self.sigThresh = sigThresh;
         end
         
         function self = addPredictor(self, mode, dat)
