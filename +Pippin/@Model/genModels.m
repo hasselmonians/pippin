@@ -91,7 +91,7 @@ function self = genModels(self, nFold)
         prms_(msng(i)) = 1;
         cmp = find(arrayfun(@(x) all(x.params==prms_), models));
         [p_, t_] = LLRT(models(maxModel), models(cmp));
-        models(maxModel).p(msng(i)) = p_
+        models(maxModel).p(msng(i)) = p_;
     end
     
     for i = 1:length(models(maxModel).params)
